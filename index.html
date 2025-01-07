@@ -129,11 +129,11 @@
             <form id="compatibility-form">
                 <div class="input-group">
                     <label for="bike-info">Bike Information</label>
-                    <input type="text" id="bike-info" placeholder="https://www.alltricks.fr/F-41505-velos-route-_-cyclocross-_-triathlon/P-2757496-velo_de_route_trek_emonda_sl_7_shimano_ultegra_di2_12v_700_mm_bleu_mulsanne_2022___produit_reconditionne">
+                    <input type="text" id="bike-info" placeholder="Enter bike information URL">
                 </div>
                 <div class="input-group">
                     <label for="product-url">Product URL</label>
-                    <input type="text" id="product-url" placeholder="https://www.alltricks.fr/F-46291-roues-route_ville_fixie/P-2914753-roue_avant_fulcrum_racing_600_700_mm___qr_9x100_mm___patins">
+                    <input type="text" id="product-url" placeholder="Enter product URL">
                 </div>
                 <button type="button" id="submit-button">Check Compatibility</button>
             </form>
@@ -145,148 +145,53 @@
             </div>
         </div>
     </div>
+
     <script>
-          // Define the correct password
-          // Define the correct password
-          const correctPassword = "alltricks2025";
+        // Password handling
+        const correctPassword = "alltricks2025";
 
-// Check local storage on page load
-window.onload = () => {
-    if (localStorage.getItem('passwordVerified') === 'true') {
-        showMainContent();
-    }
-};
-
-// Handle password submission
-document.getElementById('submit-password').addEventListener('click', () => {
-    const enteredPassword = document.getElementById('password').value;
-    if (enteredPassword === correctPassword) {
-        // Store verification in local storage
-        localStorage.setItem('passwordVerified', 'true');
-        showMainContent();
-    } else {
-        document.getElementById('error-message').style.display = 'block';
-    }
-});
-
-// Function to show the main content
-function showMainContent() {
-    document.getElementById('password-section').style.display = 'none';
-    document.getElementById('main-content').style.display = 'flex';
-}
-
-// Optional: Allow Enter key to submit the password
-document.getElementById('password').addEventListener('keyup', (event) => {
-    if (event.key === 'Enter') {
-        document.getElementById('submit-password').click();
-    }
-});
-
-   
-        async function fetchData() {
-            try {
-                const response = await fetch('data_bike_flux.json');
-                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-                return await response.json();
-            } catch (error) {
-                console.error('Error fetching JSON:', error);
-                return null;
+        window.onload = () => {
+            if (localStorage.getItem('passwordVerified') === 'true') {
+                showMainContent();
             }
+        };
+
+        document.getElementById('submit-password').addEventListener('click', () => {
+            const enteredPassword = document.getElementById('password').value;
+            if (enteredPassword === correctPassword) {
+                localStorage.setItem('passwordVerified', 'true');
+                showMainContent();
+            } else {
+                document.getElementById('error-message').style.display = 'block';
+            }
+        });
+
+        function showMainContent() {
+            document.getElementById('password-section').style.display = 'none';
+            document.getElementById('main-content').style.display = 'flex';
         }
 
-        function cleanUrl(url) {
-            return url.split('?')[0];
-        }
-
-        async function callPerplexityAPI(bikeInfo, productUrl,  productData = null) {
-            let prompt = `
-Tu es un expert en compatibilité de pièces détachées pour vélos, avec une connaissance approfondie des standards techniques des vélos de route, VTT, gravel, et urbains. Ta mission est d'analyser avec précision la compatibilité d'un produit spécifique avec un vélo donné en prenant en compte les spécifications des deux éléments. Adopte une approche rigoureuse et pédagogique, afin d'expliquer clairement tes conclusions, qu'elles soient positives ou négatives.
-
-🔍 Protocole d'Analyse
-
-Cadre : Matériau, géométrie, points de fixation, compatibilité électrique.
-
-Transmission : Standard de boîtier de pédalier, type de transmission, nombre de vitesses, compatibilité inter-marques.
-
-Roues et Pneus : Standard d'axe, diamètre, largeur de jante, compatibilité tubeless.
-
-Freinage : Type de frein (patins/disques), standard de fixation, compatibilité hydraulique/mécanique.
-
-Cockpit : Standard de direction, diamètre cintre/potence, compatibilité tige de selle.
-
-📋 Format de réponse attendu :
-
-✅ Compatibilité : Oui/Non
-
-📋 Raison : Explication technique en moins de 50 mots.
-
-📚 Cas d'usage couverts
-
-Pédaliers et boîtiers : Standards d'axes (DUB, Hollowtech II, BB30, etc.), largeur et type de boîtier.
-
-Freins : Freins à disque vs freins sur jante, type de fixation.
-
-Roues et axes : Entraxe, types d'axes (axe traversant, QR).
-
-Transmission : Nombre de vitesses, compatibilité inter-marques.
-
-Pneus : Largeur de section, type de montage (tubeless, chambre à air).
-
-Accessoires : Compatibilité des pédales, porte-bidons, etc.
-
-La réponse doit commence par compatible oui / non, et une explication de dépassant pas les 100 mots.
-
-### 🔎 **Analyse à traiter :**
-- **Vélo :** ${bikeInfo}
-- **Produit :** ${productUrl}
-
-            `;
-
-            if (productData) {
-                prompt += `
-                    - Product: ${productData.title}
-                    - Description: ${productData.description}
-                    - Price: ${productData.price}
-                `;
+        document.getElementById('password').addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                document.getElementById('submit-password').click();
             }
+        });
 
-            prompt += `
-                Your answer must include:
-                - Compatibility: Yes/No
-            `;
-            const perplexityApiKey = process.env.PERPLEXITY_API_KEY;
-            const options = {
+        // API call
+        async function callPerplexityAPI(bikeInfo, productUrl) {
+            const response = await fetch('/api/callPerplexity', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${perplexityApiKey}`,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    model: "llama-3.1-sonar-small-128k-online",
-                    messages: [
-                        { role: "system", content: "You are an expert in bike part compatibility." },
-                        { role: "user", content: prompt }
-                    ],
-                    max_tokens: 300,
-                    temperature: 0.1
+                    bikeInfo,
+                    productUrl
                 })
-            };
+            });
 
-            const response = await fetch('/api/callPerplexity', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            bikeInfo,
-            productUrl,
-            productData,
-            prompt
-        })
-    });
-
-    const data = await response.json();
-    return data.choices[0].message.content;
+            const data = await response.json();
+            return data.choices[0].message.content;
         }
 
         document.getElementById('submit-button').addEventListener('click', async () => {
@@ -298,66 +203,8 @@ La réponse doit commence par compatible oui / non, et une explication de dépas
                 return;
             }
 
-            const jsonData = await fetchData();
-            const cleanedProductUrl = cleanUrl(productUrl.trim());
-            let productFound = false;
-
-            if (jsonData) {
-                productFound = jsonData.find(item => cleanUrl(item.link) === cleanedProductUrl);
-            }
-
-            const apiResponse = await callPerplexityAPI(bikeInfo, cleanedProductUrl);
+            const apiResponse = await callPerplexityAPI(bikeInfo, productUrl);
             document.getElementById('response').innerText = apiResponse;
-
-            if (productFound) {
-                document.getElementById('response').innerText += '\nProduct found in JSON data.';
-            }
-        });
-
-        document.getElementById('report-bug-link').addEventListener('click', () => {
-            document.getElementById('bug-form').style.display = 'block';
-        });
-
-        document.getElementById('submit-bug-button').addEventListener('click', async () => {
-            const bikeInfo = document.getElementById('bike-info').value;
-            const productUrl = document.getElementById('product-url').value;
-            const apiResponse = document.getElementById('response').innerText;
-            const comment = document.getElementById('comment').value;
-           
-            const airtableApiKey = process.env.AIRTABLE_API_KEY;
-            const airtableUrl ='https://api.airtable.com/v0/appuHLOX5Vhw76mUw/tblhAA1vA7rYLVhvQ';
-            const options = {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${perplexityApiKey}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    records: [
-                        {
-                            fields: {
-                                "Bike Info": bikeInfo,
-                                "Product URL": productUrl,
-                                "API Response": apiResponse,
-                                "Comment": comment
-                            }
-                        }
-                    ]
-                })
-            };
-
-            try {
-                const response = await fetch(airtableUrl, options);
-                if (response.ok) {
-                    alert('Bug report submitted successfully!');
-                } else {
-                    const errorData = await response.json();
-                    alert(`Failed to submit bug report: ${errorData.error.message}`);
-                }
-            } catch (error) {
-                alert('An unexpected error occurred.');
-                console.error('Error:', error);
-            }
         });
     </script>
 </body>
