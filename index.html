@@ -253,7 +253,7 @@ La réponse doit commence par compatible oui / non, et une explication de dépas
                 Your answer must include:
                 - Compatibility: Yes/No
             `;
-            const perplexityApiKey = process.env.PERPLEXITY_API_KEY;
+            const perplexityApiKey = process.env.NEXT_PUBLIC_PERPLEXITY_API_KEY;
             const options = {
                 method: 'POST',
                 headers: {
@@ -311,7 +311,7 @@ La réponse doit commence par compatible oui / non, et une explication de dépas
             const apiResponse = document.getElementById('response').innerText;
             const comment = document.getElementById('comment').value;
            
-            const airtableApiKey = process.env.AIRTABLE_API_KEY;
+            const airtableApiKey = process.env.NEXT_PUBLIC_AIRTABLE_API_KEY;
             const airtableUrl ='https://api.airtable.com/v0/appuHLOX5Vhw76mUw/tblhAA1vA7rYLVhvQ';
             const options = {
                 method: 'POST',
