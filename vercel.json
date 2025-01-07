@@ -1,0 +1,7 @@
+{
+  "version": 2,
+  "env": {
+    "PERPLEXITY_API_KEY": "@perplexity-api-key",
+    "AIRTABLE_API_KEY": "@airtable-api-key"
+  }
+}
